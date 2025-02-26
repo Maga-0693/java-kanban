@@ -1,24 +1,35 @@
+package manager;
+
+import model.Epic;
+import model.Subtask;
+import model.Task;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+
 public class TaskManager {
-    private Map<Integer, Task> tasks = new HashMap<>();
-    private Map<Integer, Subtask> subtasks = new HashMap<>();
-    private Map<Integer, Epic> epics = new HashMap<>();
+    private HashMap<Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    private HashMap<Integer, Epic> epics = new HashMap<>();
     private int nextId = 1;
 
     public int generateId() {
         return nextId++;
     }
 
-    public Task createTask(Task task) {
+    //изучить тип возвращаемого параметра
+    //поменять названия методов, чтобы их названия соответсвовали их логике
+    //разобраться с put
+    //map и hashMap разобраться
+
+    //как называть директории и как их распределять
+    public Task saveTask(Task task) {
         task.setId(generateId());
         tasks.put(task.getId(), task);
         return task;
     }
 
-    public Subtask createSubtask(Subtask subtask) {
+    public Subtask saveSubtask(Subtask subtask) {
         subtask.setId(generateId());
         subtasks.put(subtask.getId(), subtask);
         Epic epic = epics.get(subtask.getEpicId());
@@ -29,21 +40,21 @@ public class TaskManager {
         return subtask;
     }
 
-    public Epic createEpic(Epic epic) {
+    public Epic saveEpic(Epic epic) {
         epic.setId(generateId());
         epics.put(epic.getId(), epic);
         return epic;
     }
 
-    public List<Task> getAllTasks() {
+    public ArrayList<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
     }
 
-    public List<Subtask> getAllSubtasks() {
+    public ArrayList<Subtask> getAllSubtasks() {
         return new ArrayList<>(subtasks.values());
     }
 
-    public List<Epic> getAllEpics() {
+    public ArrayList<Epic> getAllEpics() {
         return new ArrayList<>(epics.values());
     }
 
@@ -106,8 +117,8 @@ public class TaskManager {
         }
     }
 
-    public List<Subtask> getSubtasksByEpicId(int epicId) {
-        List<Subtask> result = new ArrayList<>();
+    public ArrayList<Subtask> getSubtasksByEpicId(int epicId) {
+        ArrayList<Subtask> result = new ArrayList<>();
         Epic epic = epics.get(epicId);
         if (epic != null) {
             for (int subtaskId : epic.getSubtaskIds()) {

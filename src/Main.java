@@ -1,33 +1,49 @@
+import manager.TaskManager;
+import model.Epic;
+import model.Subtask;
+import model.Task;
+
+import java.util.ArrayList;
+
 public class Main {
 
     public static void main(String[] args) {
         TaskManager manager = new TaskManager();
 
-        Task task1 = new Task("Task 1", "Description 1", Task.Status.NEW);
-        Task task2 = new Task("Task 2", "Description 2", Task.Status.NEW);
-        manager.createTask(task1);
-        manager.createTask(task2);
+        Task task1 = new Task("Первая задача", "Первое описание", Task.Status.NEW);
+        Task task2 = new Task("Вторая задача", "Второе описание", Task.Status.NEW);
+        manager.saveTask(task1);
+        manager.saveTask(task2);
 
-        Epic epic1 = new Epic("Epic 1", "Description Epic 1", Task.Status.NEW);
-        manager.createEpic(epic1);
-        Subtask subtask1 = new Subtask(epic1.getId(), "Subtask 1", "Description Subtask 1", Task.Status.NEW);
-        Subtask subtask2 = new Subtask(epic1.getId(), "Subtask 2", "Description Subtask 2", Task.Status.NEW);
-        manager.createSubtask(subtask1);
-        manager.createSubtask(subtask2);
+        Epic epic1 = new Epic("Первый эпик", "Описание первого эпика", Task.Status.NEW);
+        manager.saveEpic(epic1);
+        Subtask subtask1 = new Subtask(epic1.getId(), "Первая подзадача", "Описание первой подзадачи", Task.Status.NEW);
+        Subtask subtask2 = new Subtask(epic1.getId(), "Вторая подзадача", "Описание второй подзадачи", Task.Status.NEW);
+        manager.saveSubtask(subtask1);
+        manager.saveSubtask(subtask2);
 
-        Epic epic2 = new Epic("Epic 2", "Description Epic 2", Task.Status.NEW);
-        manager.createEpic(epic2);
-        Subtask subtask3 = new Subtask(epic2.getId(), "Subtask 3", "Description Subtask 3", Task.Status.NEW);
-        manager.createSubtask(subtask3);
+        Epic epic2 = new Epic("Второй эпик", "Описание второго эпика", Task.Status.NEW);
+        manager.saveEpic(epic2);
+        Subtask subtask3 = new Subtask(epic2.getId(), "Третья подзадача", "Описание третьей подзадачи", Task.Status.NEW);
+        manager.saveSubtask(subtask3);
 
         System.out.println("Все задачи:");
-        manager.getAllTasks().forEach(System.out::println);
+        ArrayList<Task> allTasks = manager.getAllTasks();
+        for (int i = 0; i < allTasks.size(); i++) {
+            System.out.println(allTasks.get(i));
+        }
 
         System.out.println("Все подзадачи:");
-        manager.getAllSubtasks().forEach(System.out::println);
+        ArrayList<Subtask> allSubtasks = manager.getAllSubtasks();
+        for (int i = 0; i < allSubtasks.size(); i++) {
+            System.out.println(allSubtasks.get(i));
+        }
 
         System.out.println("Все эпики:");
-        manager.getAllEpics().forEach(System.out::println);
+        ArrayList<Epic> allEpics = manager.getAllEpics();
+        for (int i = 0; i < allEpics.size(); i++) {
+            System.out.println(allEpics.get(i));
+        }
 
         subtask1.setStatus(Task.Status.DONE);
         manager.updateSubtask(subtask1);
@@ -36,24 +52,42 @@ public class Main {
         manager.updateSubtask(subtask2);
 
         System.out.println("Обновленные задачи:");
-        manager.getAllTasks().forEach(System.out::println);
+        allTasks = manager.getAllTasks();
+        for (int i = 0; i < allTasks.size(); i++) {
+            System.out.println(allTasks.get(i));
+        }
 
         System.out.println("Обновленные подзадачи:");
-        manager.getAllSubtasks().forEach(System.out::println);
+        allSubtasks = manager.getAllSubtasks();
+        for (int i = 0; i < allSubtasks.size(); i++) {
+            System.out.println(allSubtasks.get(i));
+        }
 
         System.out.println("Обновленные эпики:");
-        manager.getAllEpics().forEach(System.out::println);
+        allEpics = manager.getAllEpics();
+        for (int i = 0; i < allEpics.size(); i++) {
+            System.out.println(allEpics.get(i));
+        }
 
         manager.deleteTask(task1.getId());
         manager.deleteEpic(epic2.getId());
 
         System.out.println("Финальные задачи:");
-        manager.getAllTasks().forEach(System.out::println);
+        allTasks = manager.getAllTasks();
+        for (int i = 0; i < allTasks.size(); i++) {
+            System.out.println(allTasks.get(i));
+        }
 
         System.out.println("Финальные подзадачи:");
-        manager.getAllSubtasks().forEach(System.out::println);
+        allSubtasks = manager.getAllSubtasks();
+        for (int i = 0; i < allSubtasks.size(); i++) {
+            System.out.println(allSubtasks.get(i));
+        }
 
         System.out.println("Финальные эпики:");
-        manager.getAllEpics().forEach(System.out::println);
+        allEpics = manager.getAllEpics();
+        for (int i = 0; i < allEpics.size(); i++) {
+            System.out.println(allEpics.get(i));
+        }
     }
 }

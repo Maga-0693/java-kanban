@@ -1,14 +1,15 @@
+package model;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class Epic extends Task {
-    private List<Integer> subtaskIds;
-    public Epic(String name, String description, Status status) {
+    private ArrayList<Integer> subtaskIds;
+    public Epic(String name, String description, Task.Status status) {
         super(name, description, status);
         this.subtaskIds = new ArrayList<>();
     }
 
-    public List<Integer> getSubtaskIds() {
+    public ArrayList<Integer> getSubtaskIds() {
         return subtaskIds;
     }
 
@@ -22,7 +23,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
+        return "model.Epic{" +
                 "id=" + getId() +
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
