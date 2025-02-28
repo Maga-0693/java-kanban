@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtaskIds;
+
     public Epic(String name, String description, Task.Status status) {
         super(name, description, status);
         this.subtaskIds = new ArrayList<>();
@@ -23,7 +24,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "model.Epic{" +
+        return "Epic{" +
                 "id=" + getId() +
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +

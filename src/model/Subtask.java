@@ -4,7 +4,7 @@ public class Subtask extends Task {
     private int epicId;
 
     public Subtask(int epicId, String name, String description, Task.Status status) {
-        super(name, description,status);
+        super(name, description, status);
         this.epicId = epicId;
     }
 
@@ -15,9 +15,10 @@ public class Subtask extends Task {
     public void setEpicId(int epicId) {
         this.epicId = epicId;
     }
+
     @Override
     public String toString() {
-        return "model.Subtask{" +
+        return "Subtask{" +
                 "id=" + getId() +
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +

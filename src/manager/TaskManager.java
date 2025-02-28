@@ -13,16 +13,10 @@ public class TaskManager {
     private HashMap<Integer, Epic> epics = new HashMap<>();
     private int nextId = 1;
 
-    public int generateId() {
+    private int generateId() {
         return nextId++;
     }
 
-    //изучить тип возвращаемого параметра
-    //поменять названия методов, чтобы их названия соответсвовали их логике
-    //разобраться с put
-    //map и hashMap разобраться
-
-    //как называть директории и как их распределять
     public Task saveTask(Task task) {
         task.setId(generateId());
         tasks.put(task.getId(), task);
@@ -91,13 +85,13 @@ public class TaskManager {
         }
     }
 
-    public void deleteTask(int id) {
+    public void deleteTaskById(int id) {
         if (tasks.containsKey(id)) {
             tasks.remove(id);
         }
     }
 
-    public void deleteSubtask(int id) {
+    public void deleteSubtaskById(int id) {
         Subtask subtask = subtasks.remove(id);
         if (subtask != null) {
             Epic epic = epics.get(subtask.getEpicId());
@@ -108,7 +102,7 @@ public class TaskManager {
         }
     }
 
-    public void deleteEpic(int id) {
+    public void deleteEpicById(int id) {
         Epic epic = epics.remove(id);
         if (epic != null) {
             for (int subtaskId : epic.getSubtaskIds()) {

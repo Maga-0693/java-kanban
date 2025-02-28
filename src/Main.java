@@ -12,6 +12,7 @@ public class Main {
 
         Task task1 = new Task("Первая задача", "Первое описание", Task.Status.NEW);
         Task task2 = new Task("Вторая задача", "Второе описание", Task.Status.NEW);
+
         manager.saveTask(task1);
         manager.saveTask(task2);
 
@@ -69,8 +70,8 @@ public class Main {
             System.out.println(allEpics.get(i));
         }
 
-        manager.deleteTask(task1.getId());
-        manager.deleteEpic(epic2.getId());
+        manager.deleteTaskById(task1.getId());
+        manager.deleteEpicById(epic2.getId());
 
         System.out.println("Финальные задачи:");
         allTasks = manager.getAllTasks();
