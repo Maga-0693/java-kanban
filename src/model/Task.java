@@ -1,11 +1,6 @@
 package model;
 
 public class Task {
-    public enum Status {
-        NEW,
-        IN_PROGRESS,
-        DONE
-    }
 
     private int id;
     private String name;
