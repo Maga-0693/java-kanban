@@ -12,13 +12,12 @@ public class InMemoryTaskManager implements TaskManager {
     //Хранилище для задач,подзадач,эпиков. Ключ — ID задачи,подзадач,эпиков; значение — самих задач,подзадач,эпиков.
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();// Метод для получения всех подзадач определённого эпика
-    //ArrayList<Subtask> getSubtasksByEpicId(int epicId);/*!удален отсюда, т.к. перенесен в интерфейс TaskManager!*/
+    private HashMap<Integer, Epic> epics = new HashMap<>();
+
     //Счетчик для генерации ID
     private int nextId = 1;
 
     //создаем список для хранения истории просмотров
-    //заменяем этот список: private final ArrayList<Task> history = new ArrayList<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     //генерация ID для новой задачи, подзадачи или эпика
@@ -174,17 +173,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
     @Override
     public ArrayList<Task> getHistory() {
-        // заменяем: return new ArrayList<>(history) с использованием интерфейса HistoryManager; // Возвращаем копию списка истории
+        // Возвращаем копию списка истории
         return historyManager.getHistory();
     }
-//    //создаю метод для добавления задач в историю
-      //переносим данный метод в класс InMemoryHistoryManager
-//    private void addToHistory(Task task) {
-//        if (history.size() == 10) { // если размер история равен 10, то
-//            history.remove(0); // удаляем самый старый элемент
-//        }
-//        history.add(task); // иначе добавлем новый элемент
-//    }
 
     //Обновление статуса эпика на основе статусов его подзадач
     private void updateEpicStatus(Epic epic) {

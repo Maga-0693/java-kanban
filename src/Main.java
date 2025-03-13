@@ -1,4 +1,3 @@
-//import manager.InMemoryTaskManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -13,7 +12,8 @@ public class Main {
     public static void main(String[] args) {
 
         //создание менеджера задач для управления всеми задачами, эпиками, подзадачами;
-        TaskManager manager = Managers.getDefault(); //создание объекта Менеджер задач !обращаемся уже к интерфейсу TaskManager!; создаем
+        TaskManager manager = Managers.getDefault();
+        //создание объекта Менеджер задач !обращаемся уже к интерфейсу TaskManager!; создаем
         // уже менеджер задач через Managers, точнее меняем его на Managers
 
         //создаем задачи 1 и 2
@@ -132,6 +132,7 @@ public class Main {
             System.out.println(history.get(i));
         }
     }
+
     //сценарий для проверки
     private static void printAllTasks(TaskManager manager) {
         System.out.println("Задачи:");
