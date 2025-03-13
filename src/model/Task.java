@@ -2,11 +2,13 @@ package model;
 
 public class Task {
 
+    //Объявление переменных
     private int id;
     private String name;
     private String description;
     private Status status;
 
+    //Конструктор для создания задачи
     public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
@@ -45,6 +47,7 @@ public class Task {
         this.status = status;
     }
 
+    //Переопределение метода equals для сравнения задач по ID
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,11 +56,13 @@ public class Task {
         return id == task.id;
     }
 
+    //Переопределение метода hashCode для корректной работы с коллекциями
     @Override
     public int hashCode() {
         return id;
     }
 
+    //Переопределение метода toString для вывода информации о задаче
     @Override
     public String toString() {
         return "Task{" +
