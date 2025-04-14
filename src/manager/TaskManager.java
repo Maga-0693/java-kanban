@@ -30,12 +30,11 @@ public interface TaskManager {
     Epic saveEpic(Epic epic);
 
     ArrayList<Epic> getAllEpics();
-
     Epic getEpicById(int id);
 
     void updateEpic(Epic epic);
     void deleteEpicById(int id);
-    
+
     ArrayList<Subtask> getSubtasksByEpicId(int epicId);//Создаю метод для получения всех подзадач определённого эпика;
 
     ArrayList<Task> getHistory();//создаю метод для истории просмотров;
