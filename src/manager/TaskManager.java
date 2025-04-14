@@ -32,6 +32,7 @@ public interface TaskManager {
     Epic saveEpic(Epic epic);
 
     ArrayList<Epic> getAllEpics();
+
     Epic getEpicById(int id);
 
     void updateEpic(Epic epic);
