@@ -147,20 +147,23 @@ class TaskTest {
     }
     @Test
     void testHistoryManager() {
+        //Создаем менеджер задач
         TaskManager taskManager = new InMemoryTaskManager();
-
+        //Создаем 1 задачу с описанием и сохранением
         Task task1 = new Task("задача 1", "описание 1", Status.NEW);
         taskManager.saveTask(task1);
-
+        //Создаем 2 задачу с описанием и сохранением
         Task task2 = new Task("задача 2", "описание 2", Status.NEW);
         taskManager.saveTask(task2);
-
+        //Получаем задачи по id для добавления в историю
         taskManager.getTaskById(task1.getId());
         taskManager.getTaskById(task2.getId());
         taskManager.getTaskById(task1.getId());
-
+        //История просмотренных задач
         ArrayList<Task> history = taskManager.getHistory();
+        //Проверка на содержание 2-х задач
         assertEquals(2, history.size(), "История должна содержать 2 задачи");
-        assertEquals(task1, history.get(1), "Последняя задача в истории должна быть task1");
+        //Проверка, что последняя задача у нас 1 задача
+        assertEquals(task1, history.get(1), "Последняя задача в истории будет задача 1");
     }
 }
