@@ -7,6 +7,7 @@ import model.Task;
 import model.Status;
 import model.Subtask;
 import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -143,5 +144,23 @@ class TaskTest {
 
         // Проверяем, что статус эпика NEW, так как подзадач нет
         assertEquals(Status.NEW, epic.getStatus(), "Статус эпика должен быть NEW после удаления подзадачи");
+    }
+    @Test
+    void testHistoryManager() {
+        TaskManager taskManager = new InMemoryTaskManager();
+
+        Task task1 = new Task("задача 1", "описание 1", Status.NEW);
+        taskManager.saveTask(task1);
+
+        Task task2 = new Task("задача 2", "описание 2", Status.NEW);
+        taskManager.saveTask(task2);
+
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        taskManager.getTaskById(task1.getId());
+
+        ArrayList<Task> history = taskManager.getHistory();
+        assertEquals(2, history.size(), "История должна содержать 2 задачи");
+        assertEquals(task1, history.get(1), "Последняя задача в истории должна быть task1");
     }
 }
