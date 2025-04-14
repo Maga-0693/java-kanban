@@ -7,14 +7,15 @@ import model.Task;
 import java.util.ArrayList;
 
 public interface TaskManager {
-    //выношу список методов для объекта Task;
-    Task saveTask(Task task);
+
+    Task saveTask(Task task);//выношу список методов для объекта Task;
 
     ArrayList<Task> getAllTasks();
 
     Task getTaskById(int id);
 
     void updateTask(Task task);
+
     void deleteTaskById(int id);
 
     Subtask saveSubtask(Subtask subtask);//выношу список методов для объекта Subtask;
@@ -24,6 +25,7 @@ public interface TaskManager {
     Subtask getSubtaskById(int id);
 
     void updateSubtask(Subtask subtask);
+
     void deleteSubtaskById(int id);
 
     //выношу список методов для объекта Epic;
@@ -33,6 +35,7 @@ public interface TaskManager {
     Epic getEpicById(int id);
 
     void updateEpic(Epic epic);
+
     void deleteEpicById(int id);
 
     ArrayList<Subtask> getSubtasksByEpicId(int epicId);//Создаю метод для получения всех подзадач определённого эпика;
