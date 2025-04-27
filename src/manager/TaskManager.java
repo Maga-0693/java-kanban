@@ -8,7 +8,8 @@ import java.util.ArrayList;
 
 public interface TaskManager {
 
-    Task saveTask(Task task);//выношу список методов для объекта Task;
+    //выношу список методов для объекта Task;
+    Task saveTask(Task task);
 
     ArrayList<Task> getAllTasks();
 
@@ -18,7 +19,8 @@ public interface TaskManager {
 
     void deleteTaskById(int id);
 
-    Subtask saveSubtask(Subtask subtask);//выношу список методов для объекта Subtask;
+    //выношу список методов для объекта Subtask;
+    Subtask saveSubtask(Subtask subtask);
 
     ArrayList<Subtask> getAllSubtasks();
 
@@ -37,11 +39,13 @@ public interface TaskManager {
 
     void updateEpic(Epic epic);
 
+    void deleteEpicById(int id);
+
     //Создаю метод для получения всех подзадач определённого эпика;
     ArrayList<Subtask> getSubtasksByEpicId(int epicId);
 
     //создаю метод для истории просмотров;
     ArrayList<Task> getHistory();
 
-    void deleteEpicById(int id);
+
 }

@@ -4,13 +4,14 @@ import model.Task;
 import model.Status;
 import manager.TaskManager;
 import manager.Managers;
+import manager.FileBackedTaskManager;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
 
     public static void main(String[] args) {
-
         //создание менеджера задач для управления всеми задачами, эпиками, подзадачами;
         TaskManager manager = Managers.getDefault();
         //создание объекта Менеджер задач !обращаемся уже к интерфейсу TaskManager!; создаем
@@ -41,122 +42,44 @@ public class Main {
         Subtask subtask3 = new Subtask(epic2.getId(), "Третья подзадача", "Описание третьей подзадачи", Status.NEW);
         manager.saveSubtask(subtask3);
 
-        //вывод всех задач
-        System.out.println("Все задачи:");
-        ArrayList<Task> allTasks = manager.getAllTasks();
-        for (int i = 0; i < allTasks.size(); i++) {
-            System.out.println(allTasks.get(i));
-        }
+        printAllTasks(manager);
 
-        //вывод всех подзадач
-        System.out.println("Все подзадачи:");
-        ArrayList<Subtask> allSubtasks = manager.getAllSubtasks();
-        for (int i = 0; i < allSubtasks.size(); i++) {
-            System.out.println(allSubtasks.get(i));
-        }
+        // Тестирование диспетчера задач
+        try {
+            File file = File.createTempFile("задачи", ".csv");
+            FileBackedTaskManager fileManager = new FileBackedTaskManager(file);
 
-        //вывод всех эпиков
-        System.out.println("Все эпики:");
-        ArrayList<Epic> allEpics = manager.getAllEpics();
-        for (int i = 0; i < allEpics.size(); i++) {
-            System.out.println(allEpics.get(i));
-        }
+            // Добавляем задачи в файловый менеджер
+            fileManager.saveTask(new Task("Файловая задача", "Описание", Status.NEW));
+            fileManager.saveEpic(new Epic("Файловый эпик", "Описание", Status.NEW));
 
-        //меняю статус первой задачи на ВЫПОЛНЕНО
-        subtask1.setStatus(Status.DONE);
-        //Обновляем подзадачу в менеджере. Это также обновляет статус эпика, к которому она относится
-        manager.updateSubtask(subtask1);
-
-        //меняю статус второй задачи на В ПРОЦЕССЕ
-        subtask2.setStatus(Status.IN_PROGRESS);
-        //обновляем подзадачу в менеджере
-        manager.updateSubtask(subtask2);
-
-        //вывожу все обновленные задачи
-        System.out.println("Обновленные задачи:");
-        allTasks = manager.getAllTasks();
-        for (int i = 0; i < allTasks.size(); i++) {
-            System.out.println(allTasks.get(i));
-        }
-
-        //вывожу все обновленные подзадачи
-        System.out.println("Обновленные подзадачи:");
-        allSubtasks = manager.getAllSubtasks();
-        for (int i = 0; i < allSubtasks.size(); i++) {
-            System.out.println(allSubtasks.get(i));
-        }
-
-        //вывожу все обновленные эпики
-        System.out.println("Обновленные эпики:");
-        allEpics = manager.getAllEpics();
-        for (int i = 0; i < allEpics.size(); i++) {
-            System.out.println(allEpics.get(i));
-        }
-
-        //Удаляю задачу с ID task1
-        manager.deleteTaskById(task1.getId());
-        //Удаляем эпик с ID epic2. Все подзадачи, связанные с этим эпиком, также удаляются
-        manager.deleteEpicById(epic2.getId());
-
-        //вывожу все финальные задачи
-        System.out.println("Финальные задачи:");
-        allTasks = manager.getAllTasks();
-        for (int i = 0; i < allTasks.size(); i++) {
-            System.out.println(allTasks.get(i));
-        }
-
-        //вывожу все финальные подзадачи
-        System.out.println("Финальные подзадачи:");
-        allSubtasks = manager.getAllSubtasks();
-        for (int i = 0; i < allSubtasks.size(); i++) {
-            System.out.println(allSubtasks.get(i));
-        }
-
-        //выожу все финальные эпики
-        System.out.println("Финальные эпики:");
-        allEpics = manager.getAllEpics();
-        for (int i = 0; i < allEpics.size(); i++) {
-            System.out.println(allEpics.get(i));
-        }
-
-        //смотрим задачи, чтобы заполнить историю
-        manager.getTaskById(task2.getId());
-        manager.getEpicById(epic1.getId());
-        manager.getSubtaskById(subtask1.getId());
-        manager.getSubtaskById(subtask2.getId());
-
-        //вывожу историю просмотров
-        System.out.println("История просмотров:");
-        ArrayList<Task> history = manager.getHistory();
-        for (int i = 0; i < history.size(); i++) {
-            System.out.println(history.get(i));
+            // Восстанавливаем из файла
+            FileBackedTaskManager restoredManager = FileBackedTaskManager.loadFromFile(file);
+            printAllTasks(restoredManager);
+        } catch (IOException e) {
+            System.out.println("Ошибка при работе с файлом: " + e.getMessage());
         }
     }
 
-    //сценарий для проверки
+    //вывожу все задачи
     private static void printAllTasks(TaskManager manager) {
         System.out.println("Задачи:");
-        for (Task task : manager.getAllTasks()) {
-            System.out.println(task);
-        }
+        manager.getAllTasks().forEach(System.out::println);
 
+        //вывожу все эпики
         System.out.println("Эпики:");
-        for (Epic epic : manager.getAllEpics()) {
+        manager.getAllEpics().forEach(epic -> {
             System.out.println(epic);
+            manager.getSubtasksByEpicId(epic.getId()).forEach(subtask ->
+                    System.out.println("--> " + subtask));
+        });
 
-            for (Subtask subtask : manager.getSubtasksByEpicId(epic.getId())) {
-                System.out.println("--> " + subtask);
-            }
-        }
-
+        //вывод всех подзадач
         System.out.println("Подзадачи:");
-        for (Subtask subtask : manager.getAllSubtasks()) {
-            System.out.println(subtask);
-        }
+        manager.getAllSubtasks().forEach(System.out::println);
 
+        //вывожу историю просмотров
         System.out.println("История:");
-        for (Task task : manager.getHistory()) {
-            System.out.println(task);
-        }
+        manager.getHistory().forEach(System.out::println);
     }
 }
