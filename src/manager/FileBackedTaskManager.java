@@ -19,6 +19,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         this.file = file;
     }
+
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
         manager.load(); //загрузка данных из файла
@@ -220,9 +221,4 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 }
 
-//исключение для ошибок и загрузки
-class ManagerSaveException extends RuntimeException {
-    public ManagerSaveException(String message, Throwable cause) {
-        super(message, cause);
-    }
-}
+
