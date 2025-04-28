@@ -57,29 +57,32 @@ public class Main {
             FileBackedTaskManager restoredManager = FileBackedTaskManager.loadFromFile(file);
             printAllTasks(restoredManager);
         } catch (IOException e) {
-            System.out.println("Ошибка при работе с файлом: " + e.getMessage());
+            System.out.println(String.format("Ошибка при работе с файлом: %s", e.getMessage()));
         }
     }
 
     //вывожу все задачи
     private static void printAllTasks(TaskManager manager) {
         System.out.println("Задачи:");
-        manager.getAllTasks().forEach(System.out::println);
+        manager.getAllTasks().forEach(task ->
+                System.out.println(String.format("Задача: %s", task)));
 
         //вывожу все эпики
         System.out.println("Эпики:");
         manager.getAllEpics().forEach(epic -> {
-            System.out.println(epic);
+            System.out.println(String.format("Эпик: %s", epic));
             manager.getSubtasksByEpicId(epic.getId()).forEach(subtask ->
-                    System.out.println("--> " + subtask));
+                    System.out.println(String.format("--> Подзадача: %s", subtask)));
         });
 
         //вывод всех подзадач
         System.out.println("Подзадачи:");
-        manager.getAllSubtasks().forEach(System.out::println);
+        manager.getAllSubtasks().forEach(subtask ->
+                System.out.println(String.format("Подзадача: %s", subtask)));
 
         //вывожу историю просмотров
         System.out.println("История:");
-        manager.getHistory().forEach(System.out::println);
+        manager.getHistory().forEach(historyItem ->
+                System.out.println(String.format("История: %s", historyItem)));
     }
 }
