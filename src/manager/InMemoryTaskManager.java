@@ -10,18 +10,18 @@ import java.util.ArrayList;
 
 public class InMemoryTaskManager implements TaskManager {
     //Хранилище для задач,подзадач,эпиков. Ключ — ID задачи,подзадач,эпиков; значение — самих задач,подзадач,эпиков.
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    protected final HashMap<Integer, Task> tasks = new HashMap<>();
+    protected final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    protected final HashMap<Integer, Epic> epics = new HashMap<>();
 
     //Счетчик для генерации ID
-    private int nextId = 1;
+    protected int nextId = 1;
 
     //создаем список для хранения истории просмотров
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     //генерация ID для новой задачи, подзадачи или эпика
-    private int generateId() {
+    protected int generateId() {
 
         return nextId++;
     }
@@ -188,7 +188,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     //Обновление статуса эпика на основе статусов его подзадач
-    private void updateEpicStatus(Epic epic) {
+    protected void updateEpicStatus(Epic epic) {
         if (epic.getSubtaskIds().isEmpty()) { //Если у эпика нет подзадач, статус NEW
             epic.setStatus(Status.NEW);
             return;
