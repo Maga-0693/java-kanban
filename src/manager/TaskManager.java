@@ -47,5 +47,11 @@ public interface TaskManager {
     //создаю метод для истории просмотров;
     ArrayList<Task> getHistory();
 
+    ArrayList<Task> getPrioritizedTasks();
 
+    boolean isTasksOverlap(Task task1, Task task2);
+
+    boolean checkTasksOverlap(Task task1, Task task2);
+
+    boolean checkTaskOverlapWithExisting(Task task);
 }
