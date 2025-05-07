@@ -43,11 +43,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.saveEpic(epic); // Сначала сохраняем эпик
 
         // Корректируем время начала задачи, чтобы избежать пересечения
-        task.setStartTime(baseTime.plusHours(4));
+        task.setStartTime(baseTime.plusHours(1));
         taskManager.saveTask(task);
 
         // Корректируем время начала подзадачи, чтобы избежать пересечения
-        subtask.setStartTime(baseTime.plusHours(5));
+        subtask.setStartTime(baseTime.plusHours(3));
         taskManager.saveSubtask(subtask);
 
         List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
