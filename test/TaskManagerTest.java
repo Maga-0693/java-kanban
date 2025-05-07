@@ -42,12 +42,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     void testGetPrioritizedTasks() {
         taskManager.saveEpic(epic); // Сначала сохраняем эпик
 
-        // Корректируем время начала задачи, чтобы избежать пересечения
+        // Устанавливаем время начала задачи на 1 час от базового времени
         task.setStartTime(baseTime.plusHours(1));
+        task.setDuration(Duration.ofHours(1)); // Устанавливаем продолжительность задачи
         taskManager.saveTask(task);
 
-        // Корректируем время начала подзадачи, чтобы избежать пересечения
+        // Устанавливаем время начала подзадачи на 3 часа от базового времени
         subtask.setStartTime(baseTime.plusHours(3));
+        subtask.setDuration(Duration.ofHours(1)); // Устанавливаем продолжительность подзадачи
         taskManager.saveSubtask(subtask);
 
         List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
