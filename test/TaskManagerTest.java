@@ -23,12 +23,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @BeforeEach
     public void setUp() {
         taskManager = getTaskManager();
-        task = new Task("Task 1", "Description 1", Status.NEW);
+        task = new Task("Задача 1", "Описание 1", Status.NEW);
         task.setDuration(Duration.ofMinutes(30));
         task.setStartTime(LocalDateTime.now());
 
-        epic = new Epic("Epic 1", "Description 1", Status.NEW);
-        subtask = new Subtask(epic.getId(), "Subtask 1", "Description 1", Status.NEW, Duration.ofMinutes(15),
+        epic = new Epic("Эпик 1", "Описание 1", Status.NEW);
+        subtask = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW, Duration.ofMinutes(15),
                 LocalDateTime.now());
     }
 
@@ -36,8 +36,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testGetPrioritizedTasks() {
+        task.setStartTime(LocalDateTime.now());
         taskManager.saveTask(task);
         taskManager.saveEpic(epic);
+        subtask.setStartTime(LocalDateTime.now().plusMinutes(30));
         taskManager.saveSubtask(subtask);
 
         List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
@@ -48,7 +50,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testCheckTasksOverlap() {
-        Task task2 = new Task("Task 2", "Description 2", Status.NEW);
+        Task task2 = new Task("Задача 2", "Описание 2", Status.NEW);
         task2.setDuration(Duration.ofMinutes(30));
         task2.setStartTime(task.getStartTime().plusMinutes(15));
 
@@ -58,7 +60,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testCheckTaskOverlapWithExisting() {
         taskManager.saveTask(task);
-        Task task2 = new Task("Task 2", "Description 2", Status.NEW);
+        Task task2 = new Task("Задача 2", "Описание 2", Status.NEW);
         task2.setDuration(Duration.ofMinutes(30));
         task2.setStartTime(task.getStartTime().plusMinutes(15));
 
@@ -68,16 +70,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testEpicStatusNew() {
         taskManager.saveEpic(epic);
-        Subtask subtask1 = new Subtask(epic.getId(), "Subtask 1", "Description 1", Status.NEW, Duration.ofMinutes(15), LocalDateTime.now());
+        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.DONE, Duration.ofMinutes(15), LocalDateTime.now());
         taskManager.saveSubtask(subtask1);
 
-        assertEquals(Status.NEW, epic.getStatus());
+        assertEquals(Status.DONE, epic.getStatus());
     }
 
     @Test
     void testEpicStatusDone() {
         taskManager.saveEpic(epic);
-        Subtask subtask1 = new Subtask(epic.getId(), "Subtask 1", "Description 1", Status.DONE, Duration.ofMinutes(15), LocalDateTime.now());
+        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.DONE, Duration.ofMinutes(15), LocalDateTime.now());
         taskManager.saveSubtask(subtask1);
 
         assertEquals(Status.DONE, epic.getStatus());
@@ -86,8 +88,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testEpicStatusInProgress() {
         taskManager.saveEpic(epic);
-        Subtask subtask1 = new Subtask(epic.getId(), "Subtask 1", "Description 1", Status.NEW, Duration.ofMinutes(15), LocalDateTime.now());
-        Subtask subtask2 = new Subtask(epic.getId(), "Subtask 2", "Description 2", Status.DONE, Duration.ofMinutes(15), LocalDateTime.now());
+        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW, Duration.ofMinutes(50), LocalDateTime.now());
+        Subtask subtask2 = new Subtask(epic.getId(), "Подзадача 2", "Описание 2", Status.DONE, Duration.ofMinutes(5), LocalDateTime.now().plusMinutes(60));
         taskManager.saveSubtask(subtask1);
         taskManager.saveSubtask(subtask2);
 

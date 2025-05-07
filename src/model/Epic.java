@@ -3,6 +3,7 @@ package model;
 import manager.Managers;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -45,34 +46,36 @@ public class Epic extends Task {
         this.endTime = endTime;
     }
 
-    public void updateEpicDurationAndTime() {
-        if (subtaskIds.isEmpty()) {
-            setDuration(Duration.ZERO);
+    public void updateDurationAndTime(List<Subtask> subtasks) {
+        if (subtasks == null || subtasks.isEmpty()) {
+            setDuration(null);
             setStartTime(null);
             setEndTime(null);
             return;
         }
 
         Duration totalDuration = Duration.ZERO;
-        LocalDateTime earliestStartTime = null;
-        LocalDateTime latestEndTime = null;
+        LocalDateTime earliestStart = null;
+        LocalDateTime latestEnd = null;
 
-        for (int subtaskId : subtaskIds) {
-            Subtask subtask = Managers.getDefault().getSubtaskById(subtaskId);
-            if (subtask != null) {
+        for (Subtask subtask : subtasks) {
+            if (subtask.getStartTime() != null && subtask.getDuration() != null) {
                 totalDuration = totalDuration.plus(subtask.getDuration());
-                if (earliestStartTime == null || subtask.getStartTime().isBefore(earliestStartTime)) {
-                    earliestStartTime = subtask.getStartTime();
+
+                if (earliestStart == null || subtask.getStartTime().isBefore(earliestStart)) {
+                    earliestStart = subtask.getStartTime();
                 }
-                if (latestEndTime == null || subtask.getEndTime().isAfter(latestEndTime)) {
-                    latestEndTime = subtask.getEndTime();
+
+                LocalDateTime subtaskEnd = subtask.getEndTime();
+                if (latestEnd == null || subtaskEnd.isAfter(latestEnd)) {
+                    latestEnd = subtaskEnd;
                 }
             }
         }
 
         setDuration(totalDuration);
-        setStartTime(earliestStartTime);
-        setEndTime(latestEndTime);
+        setStartTime(earliestStart);
+        setEndTime(latestEnd);
     }
 
     //Переопределение метода toString для вывода информации об эпике

@@ -26,9 +26,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     //метод для загрузки данных из файла
     private void load() {
         try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
+            if (!file.exists()) return;
+
             String content = Files.readString(file.toPath());
             String[] lines = content.split("\n");
 
@@ -65,20 +64,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             List<String> lines = new ArrayList<>();
             lines.add("id,type,name,status,description,epic,duration,startTime");
 
-            // добавление всех задач
-            for (Task task : getAllTasks()) {
-                lines.add(toString(task));
-            }
-
-            //добавление всех эпиков
-            for (Epic epic : getAllEpics()) {
-                lines.add(toString(epic));
-            }
-
-            //добавление всех подзадач
-            for (Subtask subtask : getAllSubtasks()) {
-                lines.add(toString(subtask));
-            }
+            getAllTasks().forEach(task -> lines.add(toString(task)));
+            getAllEpics().forEach(epic -> lines.add(toString(epic)));
+            getAllSubtasks().forEach(subtask -> lines.add(toString(subtask)));
 
             //список строк записывается в файл, при исключении выдает ошибку
             Files.write(file.toPath(), lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
