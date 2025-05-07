@@ -267,7 +267,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected void updateEpicDurationAndTime(Epic epic) {
         List<Subtask> subtasks = getSubtasksByEpicId(epic.getId());
         if (subtasks.isEmpty()) {
-            epic.setDuration(null);
+            epic.setDuration(Duration.ZERO);
             epic.setStartTime(null);
             epic.setEndTime(null);
             return;

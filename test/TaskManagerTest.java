@@ -84,6 +84,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         assertEquals(Status.NEW, epic.getStatus(), "Статус должен быть NEW");
         assertNotNull(epic.getDuration(), "Продолжительность эпика не должна быть null");
+        assertTrue(epic.getDuration().toMinutes() >= 0, "Продолжительность должна быть >= 0");
     }
 
     @Test
@@ -110,4 +111,5 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статус должен быть IN_PROGRESS");
         assertNotNull(epic.getDuration(), "Продолжительность эпика не должна быть null");
     }
+
 }

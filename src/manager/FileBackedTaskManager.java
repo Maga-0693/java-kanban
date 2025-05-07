@@ -91,6 +91,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             );
         } else if (task instanceof Epic) {
             Epic epic = (Epic) task;
+            // Добавляем проверку на null для duration
+            String durationStr = epic.getDuration() != null ?
+                    Long.toString(epic.getDuration().toMinutes()) : "0";
+            String startTimeStr = epic.getStartTime() != null ?
+                    epic.getStartTime().toString() : "";
+
             return String.join(",",
                     Integer.toString(epic.getId()),
                     TaskType.EPIC.name(),
@@ -98,19 +104,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     epic.getStatus().name(),
                     epic.getDescription(),
                     "",
-                    Long.toString(epic.getDuration().toMinutes()),
-                    epic.getStartTime().toString()
+                    durationStr,
+                    startTimeStr
             );
         } else {
+            Task regularTask = task;
             return String.join(",",
-                    Integer.toString(task.getId()),
+                    Integer.toString(regularTask.getId()),
                     TaskType.TASK.name(),
-                    task.getName(),
-                    task.getStatus().name(),
-                    task.getDescription(),
+                    regularTask.getName(),
+                    regularTask.getStatus().name(),
+                    regularTask.getDescription(),
                     "",
-                    Long.toString(task.getDuration().toMinutes()),
-                    task.getStartTime().toString()
+                    Long.toString(regularTask.getDuration().toMinutes()),
+                    regularTask.getStartTime().toString()
             );
         }
     }
@@ -120,16 +127,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String[] parts = value.split(",");
         if (parts.length < 8) return null;
 
-        //из массива берем тип, имя, статус и описание задачи
         int id = Integer.parseInt(parts[0]);
         TaskType type = TaskType.valueOf(parts[1]);
         String name = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
-        Duration duration = Duration.ofMinutes(Long.parseLong(parts[6]));
-        LocalDateTime startTime = LocalDateTime.parse(parts[7]);
 
-        //создаем определенный тип задачи
+        // Обработка duration (может быть пустым для эпиков)
+        Duration duration = parts[6].isEmpty() ?
+                Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
+
+        // Обработка startTime (может быть пустым)
+        LocalDateTime startTime = parts[7].isEmpty() ?
+                null : LocalDateTime.parse(parts[7]);
+
         switch (type) {
             case TASK:
                 Task task = new Task(name, description, status);
