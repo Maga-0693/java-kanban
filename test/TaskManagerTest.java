@@ -41,7 +41,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testGetPrioritizedTasks() {
         taskManager.saveEpic(epic); // Сначала сохраняем эпик
+
+        // Корректируем время начала задачи, чтобы избежать пересечения
+        task.setStartTime(baseTime.plusHours(4));
         taskManager.saveTask(task);
+
+        // Корректируем время начала подзадачи, чтобы избежать пересечения
+        subtask.setStartTime(baseTime.plusHours(5));
         taskManager.saveSubtask(subtask);
 
         List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
@@ -78,8 +84,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testEpicStatusNew() {
         taskManager.saveEpic(epic);
+
+        // Корректируем время начала подзадачи, чтобы избежать пересечения
         Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW,
-                Duration.ofMinutes(15), baseTime.plusHours(4));
+                Duration.ofMinutes(15), baseTime.plusHours(7));
         taskManager.saveSubtask(subtask1);
 
         assertEquals(Status.NEW, epic.getStatus(), "Статус должен быть NEW");
@@ -90,8 +98,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testEpicStatusDone() {
         taskManager.saveEpic(epic);
+
+        // Корректируем время начала подзадачи, чтобы избежать пересечения
         Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.DONE,
-                Duration.ofMinutes(15), baseTime.plusHours(4));
+                Duration.ofMinutes(15), baseTime.plusHours(6));
         taskManager.saveSubtask(subtask1);
 
         assertEquals(Status.DONE, epic.getStatus(), "Статус должен быть DONE");
