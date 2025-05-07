@@ -1,6 +1,5 @@
 package model;
 
-import manager.Managers;
 
 import java.util.ArrayList;
 import java.util.List;
