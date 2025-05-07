@@ -48,7 +48,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.saveTask(task);
 
         // Устанавливаем время начала подзадачи на 5 часов от базового времени
-        subtask.setStartTime(baseTime.plusHours(5));
+        subtask.setStartTime(baseTime.plusHours(8));
         subtask.setDuration(Duration.ofHours(1)); // Устанавливаем продолжительность подзадачи
         taskManager.saveSubtask(subtask);
 
