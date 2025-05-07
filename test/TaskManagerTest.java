@@ -19,27 +19,29 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     protected Task task;
     protected Epic epic;
     protected Subtask subtask;
+    protected LocalDateTime testTime;
 
     @BeforeEach
     public void setUp() {
         taskManager = getTaskManager();
+        testTime = LocalDateTime.now();
+
+        // Создаем задачи с разными временными интервалами
         task = new Task("Задача 1", "Описание 1", Status.NEW);
         task.setDuration(Duration.ofMinutes(30));
-        task.setStartTime(LocalDateTime.now());
+        task.setStartTime(testTime.plusHours(1));
 
         epic = new Epic("Эпик 1", "Описание 1", Status.NEW);
-        subtask = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW, Duration.ofMinutes(15),
-                LocalDateTime.now());
+        subtask = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW,
+                Duration.ofMinutes(15), testTime.plusHours(2));
     }
 
     protected abstract T getTaskManager();
 
     @Test
     void testGetPrioritizedTasks() {
-        task.setStartTime(LocalDateTime.now());
         taskManager.saveTask(task);
         taskManager.saveEpic(epic);
-        subtask.setStartTime(LocalDateTime.now().plusMinutes(30));
         taskManager.saveSubtask(subtask);
 
         List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
@@ -52,7 +54,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     void testCheckTasksOverlap() {
         Task task2 = new Task("Задача 2", "Описание 2", Status.NEW);
         task2.setDuration(Duration.ofMinutes(30));
-        task2.setStartTime(task.getStartTime().plusMinutes(15));
+        task2.setStartTime(testTime.plusHours(1).plusMinutes(45));
 
         assertTrue(taskManager.checkTasksOverlap(task, task2));
     }
@@ -62,7 +64,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.saveTask(task);
         Task task2 = new Task("Задача 2", "Описание 2", Status.NEW);
         task2.setDuration(Duration.ofMinutes(30));
-        task2.setStartTime(task.getStartTime().plusMinutes(15));
+        task2.setStartTime(testTime.plusHours(1).plusMinutes(15));
 
         assertTrue(taskManager.checkTaskOverlapWithExisting(task2));
     }
@@ -70,29 +72,33 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testEpicStatusNew() {
         taskManager.saveEpic(epic);
-        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.DONE, Duration.ofMinutes(15), LocalDateTime.now());
+        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW,
+                Duration.ofMinutes(15), testTime.plusHours(3));
         taskManager.saveSubtask(subtask1);
 
-        assertEquals(Status.DONE, epic.getStatus());
+        assertEquals(Status.NEW, epic.getStatus());
+        assertNotNull(epic.getDuration());
     }
 
     @Test
     void testEpicStatusDone() {
         taskManager.saveEpic(epic);
-        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.DONE, Duration.ofMinutes(15), LocalDateTime.now());
+        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.DONE, Duration.ofMinutes(15), testTime.plusHours(3));
         taskManager.saveSubtask(subtask1);
 
         assertEquals(Status.DONE, epic.getStatus());
+        assertNotNull(epic.getDuration());
     }
 
     @Test
     void testEpicStatusInProgress() {
         taskManager.saveEpic(epic);
-        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW, Duration.ofMinutes(50), LocalDateTime.now());
-        Subtask subtask2 = new Subtask(epic.getId(), "Подзадача 2", "Описание 2", Status.DONE, Duration.ofMinutes(5), LocalDateTime.now().plusMinutes(60));
+        Subtask subtask1 = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW, Duration.ofMinutes(50), testTime.plusHours(3));
+        Subtask subtask2 = new Subtask(epic.getId(), "Подзадача 2", "Описание 2", Status.DONE, Duration.ofMinutes(5), testTime.plusHours(4));
         taskManager.saveSubtask(subtask1);
         taskManager.saveSubtask(subtask2);
 
         assertEquals(Status.IN_PROGRESS, epic.getStatus());
+        assertNotNull(epic.getDuration());
     }
 }

@@ -8,6 +8,8 @@ import model.Status;
 import model.Subtask;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,8 +18,10 @@ class TaskTest {
     @Test
     void testTasksWithSameIdAreEqual() {
         Task task1 = new Task("Задача 1", "Описание 1", Status.NEW);
+        task1.setId(1);
 
         Task task2 = new Task("Задача 2", "Описание 2", Status.IN_PROGRESS);
+        task2.setId(1);
 
         assertEquals(task1, task2, "Задачи с одинаковыми ID равны");
         assertEquals(task1.hashCode(), task2.hashCode(), "Хэш-коды задач с одинаковыми ID равны");
@@ -26,8 +30,10 @@ class TaskTest {
     @Test
     void testEpicEqualityById() {
         Epic epic1 = new Epic("Эпик 1", "Описание 1", Status.NEW);
+        epic1.setId(1);
 
         Epic epic2 = new Epic("Эпик 2", "Описание 2", Status.IN_PROGRESS);
+        epic2.setId(1);
 
         assertEquals(epic1, epic2, "Эпики с одинаковыми ID равны");
         assertEquals(epic1.hashCode(), epic2.hashCode(), "Хэш-коды эпиков с одинаковыми ID равны");
@@ -40,7 +46,7 @@ class TaskTest {
         Epic epic = new Epic("Эпик 1", "Описание 1", Status.NEW);
         taskManager.saveEpic(epic);
 
-        Subtask subtask = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW, null, null);
+        Subtask subtask = new Subtask(epic.getId(), "Подзадача 1", "Описание 1", Status.NEW, Duration.ofMinutes(15), LocalDateTime.now().plusHours(1));
         taskManager.saveSubtask(subtask);
 
         Subtask savedSubtask = taskManager.getSubtaskById(subtask.getId());
