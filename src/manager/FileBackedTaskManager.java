@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,42 +20,36 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(File file) {
 
         this.file = file;
-    }
-
-    public static FileBackedTaskManager loadFromFile(File file) {
-        FileBackedTaskManager manager = new FileBackedTaskManager(file);
-        manager.load(); //загрузка данных из файла
-        return manager;
+        load(); //загружаю данные при создании менеджера
     }
 
     //метод для загрузки данных из файла
     private void load() {
         try {
-            String content = Files.readString(file.toPath()); //чтение файла в одну строку
-            String[] lines = content.split("\n"); //разбивка на массив строк по символу новой строки
+            if (!file.exists()) return;
 
-            if (lines.length <= 1) return; // пропускаем заголовок или пустой файл
+            String content = Files.readString(file.toPath());
+            String[] lines = content.split("\n");
+
+            if (lines.length <= 1) return;
 
             for (int i = 1; i < lines.length; i++) {
-                Task task = fromString(lines[i]); //создание задачи из строки
+                Task task = fromString(lines[i]);
                 if (task != null) {
                     if (task instanceof Epic) {
                         epics.put(task.getId(), (Epic) task);
                     } else if (task instanceof Subtask) {
                         subtasks.put(task.getId(), (Subtask) task);
-
-                        //добавляю в эпик id задачи
                         Epic epic = epics.get(((Subtask) task).getEpicId());
                         if (epic != null) {
-                            epic.addSubtaskId(task.getId());
+                            epic.addSubtaskId(task.getId()); //связываю подзадачи с эпиком
                         }
                     } else {
                         tasks.put(task.getId(), task);
                     }
-
-                    //обновление счетчика id при необходимости
+                    prioritizedTasks.add(task); //добавляю в приоритетный список
                     if (task.getId() >= nextId) {
-                        nextId = task.getId() + 1;
+                        nextId = task.getId() + 1; //обновляю счетчика ID
                     }
                 }
             }
@@ -66,22 +62,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() {
         try {
             List<String> lines = new ArrayList<>();
-            lines.add("id,type,name,status,description,epic");
+            lines.add("id,type,name,status,description,epic,duration,startTime");
 
-            // добавление всех задач
-            for (Task task : getAllTasks()) {
-                lines.add(toString(task));
-            }
-
-            //добавление всех эпиков
-            for (Epic epic : getAllEpics()) {
-                lines.add(toString(epic));
-            }
-
-            //добавление всех подзадач
-            for (Subtask subtask : getAllSubtasks()) {
-                lines.add(toString(subtask));
-            }
+            getAllTasks().forEach(task -> lines.add(toString(task)));
+            getAllEpics().forEach(epic -> lines.add(toString(epic)));
+            getAllSubtasks().forEach(subtask -> lines.add(toString(subtask)));
 
             //список строк записывается в файл, при исключении выдает ошибку
             Files.write(file.toPath(), lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -100,25 +85,39 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     subtask.getName(),
                     subtask.getStatus().name(),
                     subtask.getDescription(),
-                    Integer.toString(subtask.getEpicId())
+                    Integer.toString(subtask.getEpicId()),
+                    Long.toString(subtask.getDuration().toMinutes()),
+                    subtask.getStartTime().toString()
             );
         } else if (task instanceof Epic) {
+            Epic epic = (Epic) task;
+            // Добавляем проверку на null для duration
+            String durationStr = epic.getDuration() != null ?
+                    Long.toString(epic.getDuration().toMinutes()) : "0";
+            String startTimeStr = epic.getStartTime() != null ?
+                    epic.getStartTime().toString() : "";
+
             return String.join(",",
-                    Integer.toString(task.getId()),
+                    Integer.toString(epic.getId()),
                     TaskType.EPIC.name(),
-                    task.getName(),
-                    task.getStatus().name(),
-                    task.getDescription(),
-                    ""
+                    epic.getName(),
+                    epic.getStatus().name(),
+                    epic.getDescription(),
+                    "",
+                    durationStr,
+                    startTimeStr
             );
         } else {
+            Task regularTask = task;
             return String.join(",",
-                    Integer.toString(task.getId()),
+                    Integer.toString(regularTask.getId()),
                     TaskType.TASK.name(),
-                    task.getName(),
-                    task.getStatus().name(),
-                    task.getDescription(),
-                    ""
+                    regularTask.getName(),
+                    regularTask.getStatus().name(),
+                    regularTask.getDescription(),
+                    "",
+                    Long.toString(regularTask.getDuration().toMinutes()),
+                    regularTask.getStartTime().toString()
             );
         }
     }
@@ -126,28 +125,38 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     //метод преобразования строки csv в задачи, эпики и подзадачи по символу запятой
     private Task fromString(String value) {
         String[] parts = value.split(",");
-        if (parts.length < 6) return null;
+        if (parts.length < 8) return null;
 
-        //из массива берем тип, имя, статус и описание задачи
         int id = Integer.parseInt(parts[0]);
         TaskType type = TaskType.valueOf(parts[1]);
         String name = parts[2];
         Status status = Status.valueOf(parts[3]);
         String description = parts[4];
 
-        //создаем определенный тип задачи
+        // Обработка duration (может быть пустым для эпиков)
+        Duration duration = parts[6].isEmpty() ?
+                Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
+
+        // Обработка startTime (может быть пустым)
+        LocalDateTime startTime = parts[7].isEmpty() ?
+                null : LocalDateTime.parse(parts[7]);
+
         switch (type) {
             case TASK:
                 Task task = new Task(name, description, status);
                 task.setId(id);
+                task.setDuration(duration);
+                task.setStartTime(startTime);
                 return task;
             case EPIC:
                 Epic epic = new Epic(name, description, status);
                 epic.setId(id);
+                epic.setDuration(duration);
+                epic.setStartTime(startTime);
                 return epic;
             case SUBTASK:
                 int epicId = Integer.parseInt(parts[5]);
-                Subtask subtask = new Subtask(epicId, name, description, status);
+                Subtask subtask = new Subtask(epicId, name, description, status, duration, startTime);
                 subtask.setId(id);
                 return subtask;
             default:
@@ -213,6 +222,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
+    //загрузка менеджера из файла
+    public static FileBackedTaskManager loadFromFile(File file) {
+
+        return new FileBackedTaskManager(file);
+    }
+
     //перечисление типов задач
     private enum TaskType {
         TASK,
@@ -220,5 +235,3 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         SUBTASK
     }
 }
-
-
