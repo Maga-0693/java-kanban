@@ -73,7 +73,7 @@ public class Main {
         //вывод истории просмотров
         System.out.println("\n История просмотров");
         manager.getHistory().forEach(task ->
-                System.out.println(" - " + task.getClass().getSimpleName() + ": " + task.getName()));
+                System.out.printf(" - %s: %s%n", task.getClass().getSimpleName(), task.getName()));
 
         //проверка пересечения задач по времени
         try {
