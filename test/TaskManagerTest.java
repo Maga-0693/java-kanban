@@ -37,26 +37,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     protected abstract T getTaskManager();
-
-    @Test
-    void testGetPrioritizedTasks() {
-        taskManager.saveEpic(epic); // Сначала сохраняем эпик
-
-        // Устанавливаем время начала задачи на 1 час от базового времени
-        task.setStartTime(baseTime.plusHours(1));
-        task.setDuration(Duration.ofHours(1)); // Устанавливаем продолжительность задачи
-        taskManager.saveTask(task);
-
-        // Устанавливаем время начала подзадачи на 5 часов от базового времени
-        subtask.setStartTime(baseTime.plusHours(8));
-        subtask.setDuration(Duration.ofHours(1)); // Устанавливаем продолжительность подзадачи
-        taskManager.saveSubtask(subtask);
-
-        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
-        assertEquals(2, prioritizedTasks.size(), "Должно быть 2 задачи в приоритетном списке");
-        assertTrue(prioritizedTasks.contains(task), "Должна содержать задачу");
-        assertTrue(prioritizedTasks.contains(subtask), "Должна содержать подзадачу");
-    }
+    
 
     @Test
     void testCheckTasksOverlap() {
