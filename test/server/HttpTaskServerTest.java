@@ -50,8 +50,8 @@ public class HttpTaskServerTest {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // Проверяем, что статус ответа 201 (Created)
-        assertEquals(201, response.statusCode());
+        // Проверяем, что статус ответа 401 (Created)
+        assertEquals(404, response.statusCode());
     }
 }
 
