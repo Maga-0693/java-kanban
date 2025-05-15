@@ -6,7 +6,6 @@ import manager.TaskManager;
 import model.Task;
 
 import java.io.IOException;
-import java.util.List;
 
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
