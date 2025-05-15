@@ -6,7 +6,6 @@ import model.Status;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.URI;
