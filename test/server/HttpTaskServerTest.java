@@ -44,10 +44,13 @@ public class HttpTaskServerTest {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/tasks"))
+                .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Проверяем, что статус ответа 201 (Created)
         assertEquals(201, response.statusCode());
     }
 }
