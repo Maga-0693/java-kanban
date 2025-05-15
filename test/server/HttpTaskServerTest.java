@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class HttpTaskServerTest {
     private HttpTaskServer taskServer;
     private TaskManager manager;
-    private final Gson gson = new Gson();
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -42,11 +41,10 @@ public class HttpTaskServerTest {
         task.setStartTime(LocalDateTime.now());
 
         HttpClient client = HttpClient.newHttpClient();
-        String taskJson = gson.toJson(task);
+        String taskJson = "{\"name\":\"Test Task\",\"description\":\"Description\",\"status\":\"NEW\",\"duration\":30,\"startTime\":\"" + LocalDateTime.now() + "\"}";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/tasks"))
-                .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
                 .build();
 
@@ -54,3 +52,4 @@ public class HttpTaskServerTest {
         assertEquals(201, response.statusCode());
     }
 }
+

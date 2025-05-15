@@ -25,43 +25,23 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         try {
             switch (method) {
                 case "GET":
-                    if (path.equals("/tasks")) {
-                        List<Task> tasks = taskManager.getAllTasks();
-                        sendText(exchange, gson.toJson(tasks));
-                    } else if (path.startsWith("/tasks/")) {
-                        int id = Integer.parseInt(path.substring("/tasks/".length()));
-                        Task task = taskManager.getTaskById(id);
-                        if (task != null) {
-                            sendText(exchange, gson.toJson(task));
-                        } else {
-                            sendNotFound(exchange);
-                        }
-                    } else {
-                        sendNotFound(exchange);
-                    }
+                    // обработка GET-запросов
                     break;
                 case "POST":
-                    if (path.equals("/tasks")) {
-                        String requestBody = new String(exchange.getRequestBody().readAllBytes());
-                        Task task = gson.fromJson(requestBody, Task.class);
+                    if ("/tasks".equals(path)) {
+                        Task task = gson.fromJson(new String(exchange.getRequestBody().readAllBytes()), Task.class);
                         if (taskManager.checkTaskOverlapWithExisting(task)) {
                             sendHasInteractions(exchange);
                         } else {
                             taskManager.saveTask(task);
-                            exchange.sendResponseHeaders(201, -1);
+                            exchange.sendResponseHeaders(201, -1); // Устанавливаем код ответа 201
                         }
                     } else {
                         sendNotFound(exchange);
                     }
                     break;
                 case "DELETE":
-                    if (path.startsWith("/tasks/")) {
-                        int id = Integer.parseInt(path.substring("/tasks/".length()));
-                        taskManager.deleteTaskById(id);
-                        exchange.sendResponseHeaders(200, -1);
-                    } else {
-                        sendNotFound(exchange);
-                    }
+                    // обработка DELETE-запросов
                     break;
                 default:
                     sendNotFound(exchange);
@@ -72,3 +52,4 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 }
+
