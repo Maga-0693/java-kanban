@@ -60,18 +60,22 @@ public class Task {
     }
 
     public Duration getDuration() {
+
         return duration;
     }
 
     public void setDuration(Duration duration) {
+
         this.duration = duration;
     }
 
     public LocalDateTime getStartTime() {
+
         return startTime;
     }
 
     public void setStartTime(LocalDateTime startTime) {
+
         this.startTime = startTime;
     }
 
@@ -95,6 +99,7 @@ public class Task {
     //Переопределение метода hashCode для корректной работы с коллекциями
     @Override
     public int hashCode() {
+
         return Integer.hashCode(id);
     }
 

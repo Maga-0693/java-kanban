@@ -134,12 +134,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String description = parts[4];
 
         // Обработка duration (может быть пустым для эпиков)
-        Duration duration = parts[6].isEmpty() ?
-                Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
+        Duration duration = parts[6].isEmpty() ? Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
 
         // Обработка startTime (может быть пустым)
-        LocalDateTime startTime = parts[7].isEmpty() ?
-                null : LocalDateTime.parse(parts[7]);
+        LocalDateTime startTime = parts[7].isEmpty() ? null : LocalDateTime.parse(parts[7]);
 
         switch (type) {
             case TASK:

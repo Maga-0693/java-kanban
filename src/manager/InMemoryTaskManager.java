@@ -15,7 +15,6 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Epic> epics = new HashMap<>();
     protected int nextId = 1;
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
-
     protected final TreeSet<Task> prioritizedTasks = new TreeSet<>(
             Comparator.comparing(Task::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo))
                     .thenComparingInt(Task::getId)
@@ -24,7 +23,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public boolean isTasksOverlap(Task task1, Task task2) {
         if (task1 == task2) return false;
-
         LocalDateTime start1 = task1.getStartTime();
         LocalDateTime end1 = task1.getEndTime();
         LocalDateTime start2 = task2.getStartTime();
