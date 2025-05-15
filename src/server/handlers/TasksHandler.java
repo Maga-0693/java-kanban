@@ -28,7 +28,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                     if (path.equals("/tasks")) {
                         List<Task> tasks = taskManager.getAllTasks();
                         sendText(exchange, gson.toJson(tasks));
-                    } else {
+                    } else if (path.startsWith("/tasks/")) {
                         int id = Integer.parseInt(path.substring("/tasks/".length()));
                         Task task = taskManager.getTaskById(id);
                         if (task != null) {
@@ -36,21 +36,32 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                         } else {
                             sendNotFound(exchange);
                         }
+                    } else {
+                        sendNotFound(exchange);
                     }
                     break;
                 case "POST":
-                    Task task = gson.fromJson(new String(exchange.getRequestBody().readAllBytes()), Task.class);
-                    if (taskManager.checkTaskOverlapWithExisting(task)) {
-                        sendHasInteractions(exchange);
+                    if (path.equals("/tasks")) {
+                        String requestBody = new String(exchange.getRequestBody().readAllBytes());
+                        Task task = gson.fromJson(requestBody, Task.class);
+                        if (taskManager.checkTaskOverlapWithExisting(task)) {
+                            sendHasInteractions(exchange);
+                        } else {
+                            taskManager.saveTask(task);
+                            exchange.sendResponseHeaders(201, -1);
+                        }
                     } else {
-                        taskManager.saveTask(task);
-                        exchange.sendResponseHeaders(201, -1);
+                        sendNotFound(exchange);
                     }
                     break;
                 case "DELETE":
-                    int id = Integer.parseInt(path.substring("/tasks/".length()));
-                    taskManager.deleteTaskById(id);
-                    exchange.sendResponseHeaders(200, -1);
+                    if (path.startsWith("/tasks/")) {
+                        int id = Integer.parseInt(path.substring("/tasks/".length()));
+                        taskManager.deleteTaskById(id);
+                        exchange.sendResponseHeaders(200, -1);
+                    } else {
+                        sendNotFound(exchange);
+                    }
                     break;
                 default:
                     sendNotFound(exchange);

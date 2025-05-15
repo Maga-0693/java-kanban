@@ -6,6 +6,7 @@ import model.Status;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class HttpTaskServerTest {
     private HttpTaskServer taskServer;
     private TaskManager manager;
+    private final Gson gson = new Gson();
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -40,10 +42,11 @@ public class HttpTaskServerTest {
         task.setStartTime(LocalDateTime.now());
 
         HttpClient client = HttpClient.newHttpClient();
-        String taskJson = "{\"name\":\"Test Task\",\"description\":\"Description\",\"status\":\"NEW\",\"duration\":30,\"startTime\":\"" + LocalDateTime.now() + "\"}";
+        String taskJson = gson.toJson(task);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/tasks"))
+                .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
                 .build();
 
