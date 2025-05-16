@@ -25,7 +25,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
         try {
             switch (method) {
-                case "GET":
+                case "GET" -> {
                     if (path.equals("/epics")) {
                         List<Epic> epics = taskManager.getAllEpics();
                         sendText(exchange, gson.toJson(epics));
@@ -38,19 +38,18 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                             sendNotFound(exchange);
                         }
                     }
-                    break;
-                case "POST":
+                }
+                case "POST" -> {
                     Epic epic = gson.fromJson(new String(exchange.getRequestBody().readAllBytes()), Epic.class);
                     taskManager.saveEpic(epic);
                     exchange.sendResponseHeaders(201, -1);
-                    break;
-                case "DELETE":
+                }
+                case "DELETE" -> {
                     int id = Integer.parseInt(path.substring("/epics/".length()));
                     taskManager.deleteEpicById(id);
                     exchange.sendResponseHeaders(200, -1);
-                    break;
-                default:
-                    sendNotFound(exchange);
+                }
+                default -> sendNotFound(exchange);
             }
         } catch (Exception e) {
             e.printStackTrace();

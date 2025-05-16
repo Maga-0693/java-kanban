@@ -24,7 +24,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
 
         try {
             switch (method) {
-                case "GET":
+                case "GET" -> {
                     if (path.equals("/subtasks")) {
                         List<Subtask> subtasks = taskManager.getAllSubtasks();
                         sendText(exchange, gson.toJson(subtasks));
@@ -37,8 +37,9 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                             sendNotFound(exchange);
                         }
                     }
-                    break;
-                case "POST":
+                }
+
+                case "POST" -> {
                     Subtask subtask = gson.fromJson(new String(exchange.getRequestBody().readAllBytes()), Subtask.class);
                     if (taskManager.checkTaskOverlapWithExisting(subtask)) {
                         sendHasInteractions(exchange);
@@ -46,14 +47,14 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                         taskManager.saveSubtask(subtask);
                         exchange.sendResponseHeaders(201, -1);
                     }
-                    break;
-                case "DELETE":
+                }
+
+                case "DELETE" -> {
                     int id = Integer.parseInt(path.substring("/subtasks/".length()));
                     taskManager.deleteSubtaskById(id);
                     exchange.sendResponseHeaders(200, -1);
-                    break;
-                default:
-                    sendNotFound(exchange);
+                }
+                default -> sendNotFound(exchange);
             }
         } catch (Exception e) {
             e.printStackTrace();

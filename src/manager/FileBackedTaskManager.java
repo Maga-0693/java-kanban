@@ -139,27 +139,29 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         // Обработка startTime (может быть пустым)
         LocalDateTime startTime = parts[7].isEmpty() ? null : LocalDateTime.parse(parts[7]);
 
-        switch (type) {
-            case TASK:
+        return switch (type) {
+            case TASK -> {
                 Task task = new Task(name, description, status);
                 task.setId(id);
                 task.setDuration(duration);
                 task.setStartTime(startTime);
-                return task;
-            case EPIC:
+                yield task;
+            }
+            case EPIC -> {
                 Epic epic = new Epic(name, description, status);
                 epic.setId(id);
                 epic.setDuration(duration);
                 epic.setStartTime(startTime);
-                return epic;
-            case SUBTASK:
+                yield epic;
+            }
+            case SUBTASK -> {
                 int epicId = Integer.parseInt(parts[5]);
                 Subtask subtask = new Subtask(epicId, name, description, status, duration, startTime);
                 subtask.setId(id);
-                return subtask;
-            default:
-                return null;
-        }
+                yield subtask;
+            }
+            default -> null;
+        };
     }
 
     //переопределяем методы для сохранения, обновления и удаления задач

@@ -26,7 +26,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
         try {
             switch (method) {
-                case "GET":
+                case "GET" -> {
                     if (path.equals("/tasks")) {
                         List<Task> tasks = taskManager.getAllTasks();
                         sendText(exchange, gson.toJson(tasks));
@@ -39,9 +39,9 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                             sendNotFound(exchange);
                         }
                     }
-                    // обработка GET-запросов
-                    break;
-                case "POST":
+                }
+
+                case "POST" -> {
                     Task task = gson.fromJson(new String(exchange.getRequestBody().readAllBytes()), Task.class);
                     if (taskManager.checkTaskOverlapWithExisting(task)) {
                         sendHasInteractions(exchange);
@@ -49,15 +49,14 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                         taskManager.saveTask(task);
                         exchange.sendResponseHeaders(201, -1);
                     }
-                    break;
-                case "DELETE":
-                    // обработка DELETE-запросов
+                }
+
+                case "DELETE" -> {
                     int id = Integer.parseInt(path.substring("/tasks/".length()));
                     taskManager.deleteTaskById(id);
                     exchange.sendResponseHeaders(200, -1);
-                    break;
-                default:
-                    sendNotFound(exchange);
+                }
+                default -> sendNotFound(exchange);
             }
         } catch (Exception e) {
             e.printStackTrace();
