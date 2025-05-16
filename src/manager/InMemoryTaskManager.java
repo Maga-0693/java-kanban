@@ -15,7 +15,6 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Epic> epics = new HashMap<>();
     protected int nextId = 1;
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
-
     protected final TreeSet<Task> prioritizedTasks = new TreeSet<>(
             Comparator.comparing(Task::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo))
                     .thenComparingInt(Task::getId)
@@ -24,7 +23,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public boolean isTasksOverlap(Task task1, Task task2) {
         if (task1 == task2) return false;
-
         LocalDateTime start1 = task1.getStartTime();
         LocalDateTime end1 = task1.getEndTime();
         LocalDateTime start2 = task2.getStartTime();
@@ -293,5 +291,42 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setDuration(duration);
         epic.setStartTime(start);
         epic.setEndTime(end);
+    }
+
+    @Override
+    public void deleteTasks() {
+        tasks.values().forEach(task -> {
+            prioritizedTasks.remove(task);
+            historyManager.remove(task.getId());
+        });
+        tasks.clear();
+    }
+
+    @Override
+    public void deleteSubtasks() {
+        subtasks.values().forEach(subtask -> {
+            prioritizedTasks.remove(subtask);
+            historyManager.remove(subtask.getId());
+            Epic epic = epics.get(subtask.getEpicId());
+            if (epic != null) {
+                epic.removeSubtaskId(subtask.getId());
+                updateEpicStatus(epic);
+                updateEpicDurationAndTime(epic);
+            }
+        });
+        subtasks.clear();
+    }
+
+    @Override
+    public void deleteEpics() {
+        epics.values().forEach(epic -> {
+            historyManager.remove(epic.getId());
+            for (int subtaskId : epic.getSubtaskIds()) {
+                subtasks.remove(subtaskId);
+                prioritizedTasks.removeIf(task -> task.getId() == subtaskId);
+                historyManager.remove(subtaskId);
+            }
+        });
+        epics.clear();
     }
 }

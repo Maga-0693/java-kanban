@@ -54,4 +54,10 @@ public interface TaskManager {
     boolean checkTasksOverlap(Task task1, Task task2);
 
     boolean checkTaskOverlapWithExisting(Task task);
+
+    void deleteTasks(); // удаление всех задач
+
+    void deleteSubtasks(); // удаление всех подзадач
+
+    void deleteEpics(); // удаление всех эпиков
 }

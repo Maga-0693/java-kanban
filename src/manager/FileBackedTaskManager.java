@@ -134,56 +134,75 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String description = parts[4];
 
         // Обработка duration (может быть пустым для эпиков)
-        Duration duration = parts[6].isEmpty() ?
-                Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
+        Duration duration = parts[6].isEmpty() ? Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
 
         // Обработка startTime (может быть пустым)
-        LocalDateTime startTime = parts[7].isEmpty() ?
-                null : LocalDateTime.parse(parts[7]);
+        LocalDateTime startTime = parts[7].isEmpty() ? null : LocalDateTime.parse(parts[7]);
 
-        switch (type) {
-            case TASK:
+        return switch (type) {
+            case TASK -> {
                 Task task = new Task(name, description, status);
                 task.setId(id);
                 task.setDuration(duration);
                 task.setStartTime(startTime);
-                return task;
-            case EPIC:
+                yield task;
+            }
+            case EPIC -> {
                 Epic epic = new Epic(name, description, status);
                 epic.setId(id);
                 epic.setDuration(duration);
                 epic.setStartTime(startTime);
-                return epic;
-            case SUBTASK:
+                yield epic;
+            }
+            case SUBTASK -> {
                 int epicId = Integer.parseInt(parts[5]);
                 Subtask subtask = new Subtask(epicId, name, description, status, duration, startTime);
                 subtask.setId(id);
-                return subtask;
-            default:
-                return null;
-        }
+                yield subtask;
+            }
+            default -> null;
+        };
     }
 
     //переопределяем методы для сохранения, обновления и удаления задач
+    private <T extends Task> T save(T task) {
+        if (task.getStartTime() != null && checkTaskOverlapWithExisting(task)) {
+            throw new ManagerSaveException("Задача пересекается по времени с существующей");
+        }
+        task.setId(generateId());
+        if (task instanceof Epic) {
+            epics.put(task.getId(), (Epic) task);
+        } else if (task instanceof Subtask) {
+            subtasks.put(task.getId(), (Subtask) task);
+            Epic epic = epics.get(((Subtask) task).getEpicId());
+            if (epic != null) {
+                epic.addSubtaskId(task.getId());
+                updateEpicDurationAndTime(epic);
+                updateEpicStatus(epic);
+            }
+        } else {
+            tasks.put(task.getId(), task);
+        }
+        if (task.getStartTime() != null) {
+            prioritizedTasks.add(task);
+        }
+        save();
+        return task;
+    }
+
     @Override
     public Task saveTask(Task task) {
-        Task savedTask = super.saveTask(task);
-        save();
-        return savedTask;
+        return save(task);
     }
 
     @Override
     public Subtask saveSubtask(Subtask subtask) {
-        Subtask savedSubtask = super.saveSubtask(subtask);
-        save();
-        return savedSubtask;
+        return save(subtask);
     }
 
     @Override
     public Epic saveEpic(Epic epic) {
-        Epic savedEpic = super.saveEpic(epic);
-        save();
-        return savedEpic;
+        return save(epic);
     }
 
     @Override
