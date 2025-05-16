@@ -1,64 +1,75 @@
 package server;
+
+import com.google.gson.Gson;
+import manager.InMemoryTaskManager;
 import manager.TaskManager;
-import manager.Managers;
 import model.Task;
 import model.Status;
-import com.google.gson.Gson;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import adapters.GsonHelper;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HttpTaskServerTest {
-    private HttpTaskServer taskServer;
+public class HttpTaskManagerTasksTest {
+
     private TaskManager manager;
+    private HttpTaskServer taskServer;
     private Gson gson;
+
+    public HttpTaskManagerTasksTest() throws IOException {
+    }
 
     @BeforeEach
     public void setUp() throws IOException {
-        manager = Managers.getDefault();
+        manager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(manager);
+        gson = GsonHelper.getGson();
+        // Убираем вызовы deleteTasks(), deleteSubtasks(), deleteEpics() - они не нужны,
+        // так как manager только что создан и пустой
         taskServer.start();
-        gson = new Gson();
     }
 
     @AfterEach
-    public void tearDown() {
+    public void shutDown() {
         taskServer.stop();
     }
 
     @Test
     public void testAddTask() throws IOException, InterruptedException {
-        // Создаём задачу
-        Task task = new Task("Test 2", "Testing task 2",
-                Status.NEW);
-        // Конвертируем её в JSON
+        // создаём задачу
+        Task task = new Task("Test 2", "Testing task 2", Status.NEW);
+        task.setDuration(Duration.ofMinutes(5));
+        task.setStartTime(LocalDateTime.now());
+
+        // конвертируем её в JSON
         String taskJson = gson.toJson(task);
 
-        // Создаём HTTP-клиент и запрос
+        // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
+                .header("Content-Type", "application/json")
                 .build();
 
-        // Вызываем рест, отвечающий за создание задач
+        // вызываем рест, отвечающий за создание задач
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        // Проверяем код ответа
-        assertEquals(201, response.statusCode());
 
-        // Проверяем, что создалась одна задача с корректным именем
+        // проверяем код ответа
+        assertEquals(201, response.statusCode(), "Ожидаемый статус ответа 201");
+
+        // проверяем, что создалась одна задача с корректным именем
         List<Task> tasksFromManager = manager.getAllTasks();
 
         assertNotNull(tasksFromManager, "Задачи не возвращаются");

@@ -1,11 +1,14 @@
 package server.handlers;
+
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 import model.Task;
+import adapters.GsonHelper;
 
 import java.io.IOException;
+import java.util.List;
 
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
@@ -13,7 +16,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     public TasksHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = new Gson();
+        this.gson = GsonHelper.getGson();
     }
 
     @Override
@@ -24,23 +27,34 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         try {
             switch (method) {
                 case "GET":
+                    if (path.equals("/tasks")) {
+                        List<Task> tasks = taskManager.getAllTasks();
+                        sendText(exchange, gson.toJson(tasks));
+                    } else {
+                        int id = Integer.parseInt(path.substring("/tasks/".length()));
+                        Task task = taskManager.getTaskById(id);
+                        if (task != null) {
+                            sendText(exchange, gson.toJson(task));
+                        } else {
+                            sendNotFound(exchange);
+                        }
+                    }
                     // обработка GET-запросов
                     break;
                 case "POST":
-                    if ("/tasks".equals(path)) {
-                        Task task = gson.fromJson(new String(exchange.getRequestBody().readAllBytes()), Task.class);
-                        if (taskManager.checkTaskOverlapWithExisting(task)) {
-                            sendHasInteractions(exchange);
-                        } else {
-                            taskManager.saveTask(task);
-                            exchange.sendResponseHeaders(201, -1); // Устанавливаем код ответа 201
-                        }
+                    Task task = gson.fromJson(new String(exchange.getRequestBody().readAllBytes()), Task.class);
+                    if (taskManager.checkTaskOverlapWithExisting(task)) {
+                        sendHasInteractions(exchange);
                     } else {
-                        sendNotFound(exchange);
+                        taskManager.saveTask(task);
+                        exchange.sendResponseHeaders(201, -1);
                     }
                     break;
                 case "DELETE":
                     // обработка DELETE-запросов
+                    int id = Integer.parseInt(path.substring("/tasks/".length()));
+                    taskManager.deleteTaskById(id);
+                    exchange.sendResponseHeaders(200, -1);
                     break;
                 default:
                     sendNotFound(exchange);
@@ -51,4 +65,3 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 }
-

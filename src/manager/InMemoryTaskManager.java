@@ -292,4 +292,40 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setStartTime(start);
         epic.setEndTime(end);
     }
+    @Override
+    public void deleteTasks() {
+        tasks.values().forEach(task -> {
+            prioritizedTasks.remove(task);
+            historyManager.remove(task.getId());
+        });
+        tasks.clear();
+    }
+
+    @Override
+    public void deleteSubtasks() {
+        subtasks.values().forEach(subtask -> {
+            prioritizedTasks.remove(subtask);
+            historyManager.remove(subtask.getId());
+            Epic epic = epics.get(subtask.getEpicId());
+            if (epic != null) {
+                epic.removeSubtaskId(subtask.getId());
+                updateEpicStatus(epic);
+                updateEpicDurationAndTime(epic);
+            }
+        });
+        subtasks.clear();
+    }
+
+    @Override
+    public void deleteEpics() {
+        epics.values().forEach(epic -> {
+            historyManager.remove(epic.getId());
+            for (int subtaskId : epic.getSubtaskIds()) {
+                subtasks.remove(subtaskId);
+                prioritizedTasks.removeIf(task -> task.getId() == subtaskId);
+                historyManager.remove(subtaskId);
+            }
+        });
+        epics.clear();
+    }
 }

@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class InMemoryTaskManagerTest {
     @Test
@@ -20,6 +21,7 @@ public class InMemoryTaskManagerTest {
         manager.saveTask(task);
 
         Task savedTask = manager.getTaskById(task.getId());
+        assertNotNull(savedTask, "Сохраненная задача не должна быть null");
         assertEquals(task.getName(), savedTask.getName());
         assertEquals(task.getDescription(), savedTask.getDescription());
         assertEquals(task.getStatus(), savedTask.getStatus());
